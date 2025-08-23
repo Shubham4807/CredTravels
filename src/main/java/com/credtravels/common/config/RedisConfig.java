@@ -33,6 +33,9 @@ public class RedisConfig {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
+        
+        // Register JSR310 module for Java 8 date/time support
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
 
         GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer(mapper);
         StringRedisSerializer stringSerializer = new StringRedisSerializer();

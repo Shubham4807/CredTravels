@@ -10,8 +10,9 @@ CredTravels is a comprehensive travel booking system built with Spring Boot, fea
 - **Modular Monolith**: Single Spring Boot application with clear module boundaries
 - **Multi-Database**: Separate databases for each module (inventory, flights-info, search, booking)
 - **Caching Strategy**: Redis-based caching with application-level caching
-- **Load Balancing**: Nginx reverse proxy with rate limiting
+- **Load Balancing**: Nginx reverse proxy (no rate limiting)
 - **Search Engine**: Apache Lucene for intelligent flight search
+- **Open Access**: No authentication, no security, direct API access
 
 ### Technology Stack
 - **Backend**: Spring Boot 3.x with Java 17
@@ -91,11 +92,14 @@ java -jar target/credtravels-1.0.0.jar
 
 ### 4. Verify Setup
 ```bash
-# Check application health
+# Check application health (No authentication required)
 curl http://localhost:8080/actuator/health
 
 # Check Nginx health
 curl http://localhost/health
+
+# Test any API endpoint directly (No login required)
+curl http://localhost:8080/api/inventory/flights/1?flightDate=2024-01-15
 ```
 
 ## 🗄️ Database Schema
@@ -319,13 +323,12 @@ curl http://localhost/health
 #### `GET /api/booking/{bookingId}`
 - **Purpose**: Retrieve booking details
 - **Logic**:
-  - **Access Control**: Validates user ownership or admin access
   - **Data Retrieval**: Fetches complete booking information
   - **Status Tracking**: Current booking and payment status
   - **Passenger Details**: All passenger information
   - **Flight Details**: Complete flight and seat information
 - **Response**: Comprehensive booking details
-- **Security**: JWT token validation required
+- **Access**: Public endpoint, no authentication required
 
 #### `PUT /api/booking/{bookingId}/modify`
 - **Purpose**: Modify existing booking
@@ -408,6 +411,12 @@ curl http://localhost/health
 
 ## 🧪 Testing
 
+### 🔓 **No Authentication Required**
+- **All APIs are publicly accessible** without login, JWT tokens, or authentication headers
+- **Direct API calls** - simply use the endpoints with appropriate HTTP methods
+- **No user registration** or account creation needed
+- **Development friendly** - easy testing and integration
+
 ### Postman Collection
 Import the updated Postman collection from `postman/CredTravels_Updated.postman_collection.json` to test all APIs with detailed examples.
 
@@ -429,20 +438,21 @@ Import the updated Postman collection from `postman/CredTravels_Updated.postman_
 
 ### API Testing Examples
 ```bash
-# Test inventory update
+# Test inventory update (No authentication required)
 curl -X POST "http://localhost:8080/api/inventory/flights/1/update?flightDate=2024-01-15" \
   -H "Content-Type: application/json" \
   -d '{
-    "flightDate": "2024-01-15",
     "availableSeats": {"economy": 150, "business": 20, "first": 8},
     "pricing": {"economy": 15000, "business": 45000, "first": 80000},
-    "totalCapacity": {"economy": 150, "business": 20, "first": 8}
+    "totalCapacity": {"economy": 150, "business": 20, "first": 8},
+    "updateReason": "Initial setup",
+    "updatedBy": "admin"
   }'
 
-# Test flight search
+# Test flight search (No authentication required)
 curl "http://localhost:8080/api/search/flights?from=DEL&to=BOM&date=2024-01-15&maxHops=2&limit=50"
 
-# Test booking reservation
+# Test booking reservation (No authentication required)
 curl -X POST "http://localhost:8080/api/booking/flights/reserve" \
   -H "Content-Type: application/json" \
   -d '{
@@ -450,8 +460,12 @@ curl -X POST "http://localhost:8080/api/booking/flights/reserve" \
     "flightDate": "2024-01-15",
     "seatClass": "ECONOMY",
     "passengerCount": 2,
-    "totalAmount": 30000.00
+    "totalAmount": 30000.00,
+    "customerId": "CUST001"
   }'
+
+# Test health check (No authentication required)
+curl "http://localhost:8080/actuator/health"
 ```
 
 ## 🔧 Configuration
@@ -479,13 +493,8 @@ credtravels:
     max-passengers: 9              # Maximum passengers per booking
     seat-reservation-ttl: 900     # Seat reservation TTL (seconds)
   
-  security:
-    jwt:
-      secret: your-secret-key      # JWT secret key
-      expiration: 86400000         # Token expiration (milliseconds)
-    rate-limit:
-      requests-per-minute: 100     # API rate limiting
-      burst-capacity: 200
+  # No security configuration required
+  # All APIs are publicly accessible without authentication
 ```
 
 ### Database Configuration
@@ -539,7 +548,7 @@ docker-compose up -d --scale credtravels-app=3
 3. **Health Checks**: Monitor application health with actuator endpoints
 4. **Logging**: Configure centralized logging (ELK stack)
 5. **Monitoring**: Use Prometheus and Grafana for metrics
-6. **SSL/TLS**: Configure HTTPS with proper certificates
+6. **API Access**: All endpoints publicly accessible (no authentication required)
 
 ## 🔍 Monitoring & Observability
 
@@ -561,25 +570,19 @@ docker-compose up -d --scale credtravels-app=3
 - Different log levels for environments
 - Security event logging
 
-## 🔒 Security Features
+## 🔓 Open Access (No Security)
 
-### API Security
-- JWT-based authentication
-- Role-based access control (RBAC)
-- Rate limiting per user/IP
-- Input validation and sanitization
+### API Access
+- **No Authentication Required**: All APIs are publicly accessible
+- **No Login Required**: No user registration or login screens
+- **No JWT Tokens**: Direct API access without authentication
+- **No Rate Limiting**: Unlimited API calls (configure as needed)
 
-### Data Security
-- AES-256 encryption for sensitive data
-- TLS encryption for data in transit
-- PII protection and tokenization
-- Comprehensive audit logging
-
-### Payment Security
-- PCI compliance considerations
-- No storage of payment card details
-- 3D Secure integration ready
-- Fraud detection system integration
+### Data Access
+- **Public APIs**: All endpoints accessible without credentials
+- **No User Management**: No user accounts or profiles required
+- **Direct Access**: Simple HTTP requests without headers
+- **Development Friendly**: Easy testing and integration
 
 ## 🚀 Performance Optimization
 
@@ -719,6 +722,7 @@ For support and questions:
 - **Redis**: Cache operational with proper TTL configuration
 - **Scheduled Tasks**: Background processes running without errors
 - **API Endpoints**: All REST endpoints accessible and functional
+- **Security**: Completely removed - all APIs publicly accessible without authentication
 
 ### 📊 **Performance Metrics**
 - **Startup Time**: ~13 seconds (optimized)
@@ -730,7 +734,7 @@ For support and questions:
 ### 🔧 **Configuration Status**
 - **Environment**: Production configuration active
 - **Profiles**: `prod` profile with externalized configuration
-- **Security**: JWT authentication ready, rate limiting configured
+- **Security**: No authentication required, all APIs publicly accessible
 - **Monitoring**: Actuator endpoints enabled for health checks
 - **Logging**: Structured logging with correlation IDs
 

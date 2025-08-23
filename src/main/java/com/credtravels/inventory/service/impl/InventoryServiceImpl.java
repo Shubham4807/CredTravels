@@ -48,7 +48,6 @@ public class InventoryServiceImpl implements InventoryService {
     private ObjectMapper objectMapper;
     
     @Override
-    @Cacheable(value = "inventory", key = "#flightId + '_' + #flightDate")
     public Optional<FlightInventory> getFlightInventory(Long flightId, LocalDate flightDate) {
         log.debug("Getting flight inventory for flightId: {} and date: {}", flightId, flightDate);
         return flightInventoryRepository.findByFlightInfoIdAndFlightDate(flightId, flightDate);
@@ -88,7 +87,6 @@ public class InventoryServiceImpl implements InventoryService {
     }
     
     @Override
-    @Cacheable(value = "inventory", key = "#flightId + '_' + #flightDate")
     public FlightInventory getFlightAvailability(Long flightId, LocalDate flightDate) {
         log.debug("Getting flight availability for flightId: {} and date: {}", flightId, flightDate);
         

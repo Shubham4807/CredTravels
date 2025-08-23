@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "CredTravels API Collection - Updated",
-    "description": "Complete and updated API collection for CredTravels modular travel booking system with detailed examples",
+    "description": "Complete and updated API collection for CredTravels modular travel booking system with detailed examples. ✅ SECURITY COMPLETELY REMOVED - All APIs are publicly accessible without authentication, login, or JWT tokens.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -13,6 +13,11 @@
     {
       "key": "api_base",
       "value": "{{base_url}}/api",
+      "type": "string"
+    },
+    {
+      "key": "auth_note",
+      "value": "NO AUTHENTICATION REQUIRED - All APIs are publicly accessible without login, JWT tokens, or any security headers.",
       "type": "string"
     }
   ],
