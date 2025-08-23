@@ -10,6 +10,9 @@ import java.util.Map;
 
 public class InventoryUpdateRequest {
     
+    @NotNull(message = "Flight info ID is required")
+    private Long flightInfoId;
+    
     @NotNull(message = "Flight date is required")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate flightDate;
@@ -30,8 +33,9 @@ public class InventoryUpdateRequest {
     // Constructors
     public InventoryUpdateRequest() {}
     
-    public InventoryUpdateRequest(LocalDate flightDate, Map<String, Integer> availableSeats, 
+    public InventoryUpdateRequest(Long flightInfoId, LocalDate flightDate, Map<String, Integer> availableSeats, 
                                 Map<String, BigDecimal> pricing, Map<String, Integer> totalCapacity) {
+        this.flightInfoId = flightInfoId;
         this.flightDate = flightDate;
         this.availableSeats = availableSeats;
         this.pricing = pricing;
@@ -39,6 +43,14 @@ public class InventoryUpdateRequest {
     }
     
     // Getters and Setters
+    public Long getFlightInfoId() {
+        return flightInfoId;
+    }
+    
+    public void setFlightInfoId(Long flightInfoId) {
+        this.flightInfoId = flightInfoId;
+    }
+    
     public LocalDate getFlightDate() {
         return flightDate;
     }

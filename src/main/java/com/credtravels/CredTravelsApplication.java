@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableCaching
-@EnableJpaRepositories
 @EnableAsync
 @EnableScheduling
 public class CredTravelsApplication {

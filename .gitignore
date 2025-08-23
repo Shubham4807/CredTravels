@@ -1,0 +1,285 @@
+# CredTravels - Git Ignore File
+
+####################
+# Java
+####################
+*.class
+*.log
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+
+####################
+# Maven
+####################
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+####################
+# Spring Boot
+####################
+*.log
+logs/
+application-local.yml
+application-dev.yml
+application-prod.yml
+application-*.properties
+!application.yml
+!application-test.yml
+
+####################
+# IDE Files
+####################
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+.idea_modules/
+
+# Eclipse
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+.project
+.externalToolBuilders/
+.classpath
+.factorypath
+.buildpath
+.target
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+####################
+# Operating System
+####################
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+####################
+# Database
+####################
+*.db
+*.sqlite
+*.sqlite3
+*.h2.db
+*.trace.db
+*.lock.db
+
+####################
+# Docker
+####################
+.dockerignore
+
+####################
+# Application Specific
+####################
+
+# Logs
+logs/
+*.log
+log/
+application.log
+spring.log
+
+# Temporary files
+tmp/
+temp/
+cache/
+.cache/
+
+# Configuration files with sensitive data
+application-local.yml
+application-dev.yml
+application-prod.yml
+*-local.properties
+*-dev.properties
+*-prod.properties
+
+# API Keys and Secrets
+.env
+.env.local
+.env.*.local
+secrets.yml
+secrets.properties
+
+# Test Reports
+test-output/
+reports/
+coverage/
+
+# Lucene Index Files
+lucene-index/
+search-index/
+*.index
+
+# Redis Dump
+dump.rdb
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+####################
+# Package Managers
+####################
+
+# Node.js (if frontend is added later)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+####################
+# Build Tools
+####################
+
+# Gradle (if used)
+.gradle
+gradle/
+gradlew
+gradlew.bat
+
+# SBT (if used)
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.history
+.lib/
+
+####################
+# Documentation
+####################
+docs/_build/
+site/
+
+####################
+# Deployment
+####################
+docker-compose.override.yml
+k8s-local/
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+####################
+# Monitoring & Profiling
+####################
+*.hprof
+*.jfr
+gc*.log
+hs_err*.log
+
+####################
+# Security
+####################
+*.p12
+*.jks
+*.keystore
+*.pem
+*.key
+*.crt
+*.csr
+
+####################
+# Custom Project Files
+####################
+
+# Postman Environment Files (keep collections, ignore environments)
+postman/*environment*.json
+postman/newman/
+
+# Custom scripts
+deploy.sh
+restart.sh
+cleanup.sh
+
+# Data files
+data/
+uploads/
+downloads/
+
+# Custom configuration
+custom.properties
+local.yml
+override.yml

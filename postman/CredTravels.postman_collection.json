@@ -1,13 +1,108 @@
 {
   "info": {
     "name": "CredTravels API Collection",
-    "description": "Complete API collection for CredTravels travel booking system",
+    "description": "Complete API collection for CredTravels modular travel booking system",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost",
+      "type": "string"
+    },
+    {
+      "key": "api_base",
+      "value": "{{base_url}}/api",
+      "type": "string"
+    }
+  ],
   "item": [
+    {
+      "name": "Health & Monitoring",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Ping",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health/ping",
+              "host": ["{{base_url}}"],
+              "path": ["health", "ping"]
+            }
+          }
+        },
+        {
+          "name": "Actuator Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/actuator/health",
+              "host": ["{{base_url}}"],
+              "path": ["actuator", "health"]
+            }
+          }
+        },
+        {
+          "name": "Actuator Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/actuator/info",
+              "host": ["{{base_url}}"],
+              "path": ["actuator", "info"]
+            }
+          }
+        },
+        {
+          "name": "Actuator Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/actuator/metrics",
+              "host": ["{{base_url}}"],
+              "path": ["actuator", "metrics"]
+            }
+          }
+        }
+      ]
+    },
     {
       "name": "Inventory Management",
       "item": [
+        {
+          "name": "Get Flight Inventory",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/inventory/flights/1?flightDate=2024-01-15",
+              "host": ["{{api_base}}"],
+              "path": ["inventory", "flights", "1"],
+              "query": [
+                {
+                  "key": "flightDate",
+                  "value": "2024-01-15"
+                }
+              ]
+            }
+          }
+        },
         {
           "name": "Update Flight Inventory",
           "request": {
@@ -20,36 +115,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"flightDate\": \"2024-01-15\",\n  \"availableSeats\": {\n    \"economy\": 150,\n    \"business\": 20,\n    \"first\": 8\n  },\n  \"pricing\": {\n    \"economy\": 15000,\n    \"business\": 45000,\n    \"first\": 80000\n  },\n  \"totalCapacity\": {\n    \"economy\": 150,\n    \"business\": 20,\n    \"first\": 8\n  },\n  \"updateReason\": \"Daily update\",\n  \"updatedBy\": \"admin\"\n}"
+              "raw": "{\n  \"flightInfoId\": 1,\n  \"flightDate\": \"2024-01-15\",\n  \"availableSeats\": {\n    \"economy\": 150,\n    \"business\": 20,\n    \"first\": 8\n  },\n  \"pricing\": {\n    \"economy\": 15000,\n    \"business\": 45000,\n    \"first\": 80000\n  },\n  \"totalCapacity\": {\n    \"economy\": 150,\n    \"business\": 20,\n    \"first\": 8\n  },\n  \"updateReason\": \"Initial inventory setup\",\n  \"updatedBy\": \"admin\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/inventory/flights/1/update?flightDate=2024-01-15",
-              "host": ["{{base_url}}"],
-              "path": ["api", "inventory", "flights", "1", "update"],
-              "query": [
-                {
-                  "key": "flightDate",
-                  "value": "2024-01-15"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Flight Inventory",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/inventory/flights/1?flightDate=2024-01-15",
-              "host": ["{{base_url}}"],
-              "path": ["api", "inventory", "flights", "1"],
-              "query": [
-                {
-                  "key": "flightDate",
-                  "value": "2024-01-15"
-                }
-              ]
+              "raw": "{{api_base}}/inventory/flights/1/update",
+              "host": ["{{api_base}}"],
+              "path": ["inventory", "flights", "1", "update"]
             }
           }
         },
@@ -59,9 +130,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/inventory/flights/1/availability?flightDate=2024-01-15",
-              "host": ["{{base_url}}"],
-              "path": ["api", "inventory", "flights", "1", "availability"],
+              "raw": "{{api_base}}/inventory/flights/1/availability?flightDate=2024-01-15",
+              "host": ["{{api_base}}"],
+              "path": ["inventory", "flights", "1", "availability"],
               "query": [
                 {
                   "key": "flightDate",
@@ -83,12 +154,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"seatClass\": \"ECONOMY\",\n  \"seatCount\": 2,\n  \"customerId\": \"user001\"\n}"
+              "raw": "{\n  \"seatClass\": \"ECONOMY\",\n  \"seatCount\": 2,\n  \"customerId\": \"CUST001\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/inventory/flights/1/reserve?flightDate=2024-01-15",
-              "host": ["{{base_url}}"],
-              "path": ["api", "inventory", "flights", "1", "reserve"],
+              "raw": "{{api_base}}/inventory/flights/1/reserve?flightDate=2024-01-15",
+              "host": ["{{api_base}}"],
+              "path": ["inventory", "flights", "1", "reserve"],
               "query": [
                 {
                   "key": "flightDate",
@@ -99,25 +170,43 @@
           }
         },
         {
-          "name": "Search Flights by Route",
+          "name": "Release Seat Reservation",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/inventory/flights/1/release?reservationId=RES12345678",
+              "host": ["{{api_base}}"],
+              "path": ["inventory", "flights", "1", "release"],
+              "query": [
+                {
+                  "key": "reservationId",
+                  "value": "RES12345678"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Flights by Date and Route",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/inventory/flights/search?date=2024-01-15&from=DEL&to=BOM",
-              "host": ["{{base_url}}"],
-              "path": ["api", "inventory", "flights", "search"],
+              "raw": "{{api_base}}/inventory/flights/search?date=2024-01-15&departureAirport=DEL&arrivalAirport=BOM",
+              "host": ["{{api_base}}"],
+              "path": ["inventory", "flights", "search"],
               "query": [
                 {
                   "key": "date",
                   "value": "2024-01-15"
                 },
                 {
-                  "key": "from",
+                  "key": "departureAirport",
                   "value": "DEL"
                 },
                 {
-                  "key": "to",
+                  "key": "arrivalAirport",
                   "value": "BOM"
                 }
               ]
@@ -136,12 +225,24 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "[\n  {\n    \"flightDate\": \"2024-01-15\",\n    \"availableSeats\": {\n      \"economy\": 150,\n      \"business\": 20,\n      \"first\": 8\n    },\n    \"pricing\": {\n      \"economy\": 15000,\n      \"business\": 45000,\n      \"first\": 80000\n    },\n    \"totalCapacity\": {\n      \"economy\": 150,\n      \"business\": 20,\n      \"first\": 8\n    }\n  }\n]"
+              "raw": "[\n  {\n    \"flightInfoId\": 1,\n    \"flightDate\": \"2024-01-15\",\n    \"availableSeats\": {\n      \"economy\": 150,\n      \"business\": 20,\n      \"first\": 8\n    },\n    \"pricing\": {\n      \"economy\": 15000,\n      \"business\": 45000,\n      \"first\": 80000\n    },\n    \"totalCapacity\": {\n      \"economy\": 150,\n      \"business\": 20,\n      \"first\": 8\n    },\n    \"updateReason\": \"Batch update\",\n    \"updatedBy\": \"admin\"\n  }\n]"
             },
             "url": {
-              "raw": "{{base_url}}/api/inventory/batch-update",
-              "host": ["{{base_url}}"],
-              "path": ["api", "inventory", "batch-update"]
+              "raw": "{{api_base}}/inventory/batch-update",
+              "host": ["{{api_base}}"],
+              "path": ["inventory", "batch-update"]
+            }
+          }
+        },
+        {
+          "name": "Get Expired Reservations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/inventory/expired-reservations",
+              "host": ["{{api_base}}"],
+              "path": ["inventory", "expired-reservations"]
             }
           }
         }
@@ -151,56 +252,84 @@
       "name": "Flights Info",
       "item": [
         {
-          "name": "Get Flight Information",
+          "name": "Get Flight Info",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/flights-info/flights/1",
-              "host": ["{{base_url}}"],
-              "path": ["api", "flights-info", "flights", "1"]
+              "raw": "{{api_base}}/flights-info/flights/1",
+              "host": ["{{api_base}}"],
+              "path": ["flights-info", "flights", "1"]
             }
           }
         },
         {
-          "name": "Search Flights by Airline",
+          "name": "Search Flights",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/flights-info/flights/search?airline=AI",
-              "host": ["{{base_url}}"],
-              "path": ["api", "flights-info", "flights", "search"],
+              "raw": "{{api_base}}/flights-info/flights/search?airline=AI&route=DEL-BOM",
+              "host": ["{{api_base}}"],
+              "path": ["flights-info", "flights", "search"],
               "query": [
                 {
                   "key": "airline",
                   "value": "AI"
+                },
+                {
+                  "key": "route",
+                  "value": "DEL-BOM"
                 }
               ]
             }
           }
         },
         {
-          "name": "Get Airlines",
+          "name": "Get All Airlines",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/flights-info/airlines",
-              "host": ["{{base_url}}"],
-              "path": ["api", "flights-info", "airlines"]
+              "raw": "{{api_base}}/flights-info/airlines",
+              "host": ["{{api_base}}"],
+              "path": ["flights-info", "airlines"]
             }
           }
         },
         {
-          "name": "Get Airports",
+          "name": "Get Airline by ID",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/flights-info/airports",
-              "host": ["{{base_url}}"],
-              "path": ["api", "flights-info", "airports"]
+              "raw": "{{api_base}}/flights-info/airlines/1",
+              "host": ["{{api_base}}"],
+              "path": ["flights-info", "airlines", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get All Airports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/flights-info/airports",
+              "host": ["{{api_base}}"],
+              "path": ["flights-info", "airports"]
+            }
+          }
+        },
+        {
+          "name": "Get Airport by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/flights-info/airports/1",
+              "host": ["{{api_base}}"],
+              "path": ["flights-info", "airports", "1"]
             }
           }
         },
@@ -210,9 +339,21 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/flights-info/routes",
-              "host": ["{{base_url}}"],
-              "path": ["api", "flights-info", "routes"]
+              "raw": "{{api_base}}/flights-info/routes",
+              "host": ["{{api_base}}"],
+              "path": ["flights-info", "routes"]
+            }
+          }
+        },
+        {
+          "name": "Get Route by Airports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/flights-info/routes/1/2",
+              "host": ["{{api_base}}"],
+              "path": ["flights-info", "routes", "1", "2"]
             }
           }
         }
@@ -227,9 +368,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/search/flights?from=DEL&to=BOM&date=2024-01-15&maxHops=2&limit=50",
-              "host": ["{{base_url}}"],
-              "path": ["api", "search", "flights"],
+              "raw": "{{api_base}}/search/flights?from=DEL&to=BOM&date=2024-01-15&maxHops=2&limit=50",
+              "host": ["{{api_base}}"],
+              "path": ["search", "flights"],
               "query": [
                 {
                   "key": "from",
@@ -261,9 +402,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/search/flights/direct?from=DEL&to=BOM&date=2024-01-15",
-              "host": ["{{base_url}}"],
-              "path": ["api", "search", "flights", "direct"],
+              "raw": "{{api_base}}/search/flights/direct?from=DEL&to=BOM&date=2024-01-15",
+              "host": ["{{api_base}}"],
+              "path": ["search", "flights", "direct"],
               "query": [
                 {
                   "key": "from",
@@ -287,9 +428,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/search/airports?query=Delhi",
-              "host": ["{{base_url}}"],
-              "path": ["api", "search", "airports"],
+              "raw": "{{api_base}}/search/airports?query=Delhi",
+              "host": ["{{api_base}}"],
+              "path": ["search", "airports"],
               "query": [
                 {
                   "key": "query",
@@ -305,13 +446,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/search/suggestions?query=Del",
-              "host": ["{{base_url}}"],
-              "path": ["api", "search", "suggestions"],
+              "raw": "{{api_base}}/search/suggestions?query=Mum",
+              "host": ["{{api_base}}"],
+              "path": ["search", "suggestions"],
               "query": [
                 {
                   "key": "query",
-                  "value": "Del"
+                  "value": "Mum"
                 }
               ]
             }
@@ -329,12 +470,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"segments\": [\n    {\n      \"from\": \"DEL\",\n      \"to\": \"BOM\",\n      \"date\": \"2024-01-15\"\n    },\n    {\n      \"from\": \"BOM\",\n      \"to\": \"BLR\",\n      \"date\": \"2024-01-18\"\n    }\n  ]\n}"
+              "raw": "{\n  \"segments\": [\n    {\n      \"from\": \"DEL\",\n      \"to\": \"BOM\",\n      \"date\": \"2024-01-15\"\n    },\n    {\n      \"from\": \"BOM\",\n      \"to\": \"BLR\",\n      \"date\": \"2024-01-20\"\n    }\n  ],\n  \"seatClass\": \"ECONOMY\",\n  \"passengers\": 2\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/search/flights/multi-city",
-              "host": ["{{base_url}}"],
-              "path": ["api", "search", "flights", "multi-city"]
+              "raw": "{{api_base}}/search/flights/multi-city",
+              "host": ["{{api_base}}"],
+              "path": ["search", "flights", "multi-city"]
             }
           }
         },
@@ -344,9 +485,33 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/search/popular-routes",
-              "host": ["{{base_url}}"],
-              "path": ["api", "search", "popular-routes"]
+              "raw": "{{api_base}}/search/popular-routes",
+              "host": ["{{api_base}}"],
+              "path": ["search", "popular-routes"]
+            }
+          }
+        },
+        {
+          "name": "Build Search Index",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/search/index/build",
+              "host": ["{{api_base}}"],
+              "path": ["search", "index", "build"]
+            }
+          }
+        },
+        {
+          "name": "Update Search Index",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/search/index/update/1",
+              "host": ["{{api_base}}"],
+              "path": ["search", "index", "update", "1"]
             }
           }
         }
@@ -367,12 +532,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"flightInfoId\": 1,\n  \"flightDate\": \"2024-01-15\",\n  \"seatClass\": \"ECONOMY\",\n  \"passengerCount\": 2,\n  \"totalAmount\": 30000.00,\n  \"specialRequests\": \"Window seats preferred\"\n}"
+              "raw": "{\n  \"flightInfoId\": 1,\n  \"flightDate\": \"2024-01-15\",\n  \"seatClass\": \"ECONOMY\",\n  \"passengerCount\": 2,\n  \"totalAmount\": 30000.00,\n  \"specialRequests\": \"Window seats preferred\",\n  \"customerId\": \"CUST001\",\n  \"passengers\": [\n    {\n      \"title\": \"Mr\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Doe\",\n      \"dateOfBirth\": \"1990-01-01\",\n      \"nationality\": \"Indian\",\n      \"passportNumber\": \"A12345678\",\n      \"mealPreference\": \"Vegetarian\",\n      \"specialAssistance\": \"None\"\n    },\n    {\n      \"title\": \"Mrs\",\n      \"firstName\": \"Jane\",\n      \"lastName\": \"Doe\",\n      \"dateOfBirth\": \"1992-05-15\",\n      \"nationality\": \"Indian\",\n      \"passportNumber\": \"B87654321\",\n      \"mealPreference\": \"Non-vegetarian\",\n      \"specialAssistance\": \"None\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/booking/flights/reserve",
-              "host": ["{{base_url}}"],
-              "path": ["api", "booking", "flights", "reserve"]
+              "raw": "{{api_base}}/booking/flights/reserve",
+              "host": ["{{api_base}}"],
+              "path": ["booking", "flights", "reserve"]
             }
           }
         },
@@ -388,12 +553,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"bookingReference\": \"BK001\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"paymentDetails\": {\n    \"cardNumber\": \"4111111111111111\",\n    \"expiryMonth\": \"12\",\n    \"expiryYear\": \"2025\",\n    \"cvv\": \"123\"\n  }\n}"
+              "raw": "{\n  \"bookingReference\": \"BK12345678\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"paymentDetails\": {\n    \"cardNumber\": \"4111111111111111\",\n    \"expiryMonth\": \"12\",\n    \"expiryYear\": \"2025\",\n    \"cvv\": \"123\",\n    \"cardholderName\": \"John Doe\"\n  }\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/booking/flights/confirm",
-              "host": ["{{base_url}}"],
-              "path": ["api", "booking", "flights", "confirm"]
+              "raw": "{{api_base}}/booking/flights/confirm",
+              "host": ["{{api_base}}"],
+              "path": ["booking", "flights", "confirm"]
             }
           }
         },
@@ -403,9 +568,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/booking/BK001",
-              "host": ["{{base_url}}"],
-              "path": ["api", "booking", "BK001"]
+              "raw": "{{api_base}}/booking/BK12345678",
+              "host": ["{{api_base}}"],
+              "path": ["booking", "BK12345678"]
             }
           }
         },
@@ -421,12 +586,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"modificationType\": \"PASSENGER_UPDATE\",\n  \"passengerUpdates\": [\n    {\n      \"passengerId\": 1,\n      \"firstName\": \"John Updated\",\n      \"lastName\": \"Doe Updated\"\n    }\n  ]\n}"
+              "raw": "{\n  \"seatClass\": \"BUSINESS\",\n  \"specialRequests\": \"Updated special requests\",\n  \"passengers\": [\n    {\n      \"title\": \"Mr\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Doe\",\n      \"dateOfBirth\": \"1990-01-01\",\n      \"nationality\": \"Indian\",\n      \"passportNumber\": \"A12345678\",\n      \"mealPreference\": \"Vegetarian\",\n      \"specialAssistance\": \"None\"\n    }\n  ]\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/booking/BK001/modify",
-              "host": ["{{base_url}}"],
-              "path": ["api", "booking", "BK001", "modify"]
+              "raw": "{{api_base}}/booking/BK12345678/modify",
+              "host": ["{{api_base}}"],
+              "path": ["booking", "BK12345678", "modify"]
             }
           }
         },
@@ -436,9 +601,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/booking/BK001/cancel",
-              "host": ["{{base_url}}"],
-              "path": ["api", "booking", "BK001", "cancel"]
+              "raw": "{{api_base}}/booking/BK12345678/cancel",
+              "host": ["{{api_base}}"],
+              "path": ["booking", "BK12345678", "cancel"]
             }
           }
         },
@@ -448,94 +613,39 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/booking/user/user001",
-              "host": ["{{base_url}}"],
-              "path": ["api", "booking", "user", "user001"]
+              "raw": "{{api_base}}/booking/user/CUST001",
+              "host": ["{{api_base}}"],
+              "path": ["booking", "user", "CUST001"]
             }
           }
         },
         {
-          "name": "Payment Callback",
+          "name": "Process Payment Callback",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"transactionId\": \"TXN001\",\n  \"status\": \"SUCCESS\",\n  \"amount\": 30000.00,\n  \"gatewayResponse\": {\n    \"responseCode\": \"000\",\n    \"responseMessage\": \"Transaction successful\"\n  }\n}"
-            },
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/api/booking/payment/callback",
-              "host": ["{{base_url}}"],
-              "path": ["api", "booking", "payment", "callback"]
+              "raw": "{{api_base}}/booking/payment/callback?bookingReference=BK12345678&transactionId=TXN123456&status=SUCCESS",
+              "host": ["{{api_base}}"],
+              "path": ["booking", "payment", "callback"],
+              "query": [
+                {
+                  "key": "bookingReference",
+                  "value": "BK12345678"
+                },
+                {
+                  "key": "transactionId",
+                  "value": "TXN123456"
+                },
+                {
+                  "key": "status",
+                  "value": "SUCCESS"
+                }
+              ]
             }
           }
         }
       ]
-    },
-    {
-      "name": "Health & Monitoring",
-      "item": [
-        {
-          "name": "Health Check",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/actuator/health",
-              "host": ["{{base_url}}"],
-              "path": ["actuator", "health"]
-            }
-          }
-        },
-        {
-          "name": "Application Info",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/actuator/info",
-              "host": ["{{base_url}}"],
-              "path": ["actuator", "info"]
-            }
-          }
-        },
-        {
-          "name": "Metrics",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/actuator/metrics",
-              "host": ["{{base_url}}"],
-              "path": ["actuator", "metrics"]
-            }
-          }
-        },
-        {
-          "name": "Prometheus Metrics",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/actuator/prometheus",
-              "host": ["{{base_url}}"],
-              "path": ["actuator", "prometheus"]
-            }
-          }
-        }
-      ]
-    }
-  ],
-  "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:8080",
-      "type": "string"
     }
   ]
 }

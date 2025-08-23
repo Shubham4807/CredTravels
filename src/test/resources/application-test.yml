@@ -1,0 +1,45 @@
+spring:
+  datasource:
+    inventory:
+      jdbc-url: jdbc:h2:mem:inventory_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username: sa
+      password: 
+      driver-class-name: org.h2.Driver
+    
+    flights-info:
+      jdbc-url: jdbc:h2:mem:flights_info_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username: sa
+      password: 
+      driver-class-name: org.h2.Driver
+    
+    search:
+      jdbc-url: jdbc:h2:mem:search_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username: sa
+      password: 
+      driver-class-name: org.h2.Driver
+    
+    booking:
+      jdbc-url: jdbc:h2:mem:booking_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username: sa
+      password: 
+      driver-class-name: org.h2.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        hbm2ddl:
+          auto: create-drop
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+logging:
+  level:
+    com.credtravels: DEBUG
+    org.springframework.security: DEBUG
