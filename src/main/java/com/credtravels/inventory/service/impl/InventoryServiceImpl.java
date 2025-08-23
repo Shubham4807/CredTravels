@@ -196,7 +196,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public List<SeatReservation> getExpiredReservations() {
         log.debug("Getting expired reservations");
-        return seatReservationRepository.findExpiredReservations();
+        return seatReservationRepository.findExpiredReservations(LocalDateTime.now());
     }
     
     @Override

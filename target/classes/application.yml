@@ -1,108 +1,29 @@
+# CredTravels - Base Application Configuration
+# This file contains minimal common configuration
+# Environment-specific overrides are in application-{profile}.yml files
+# Memory: 1 GB max
+
 spring:
   application:
     name: credtravels
-  
   profiles:
-    active: dev
-  
-  # Database Configurations
-  datasource:
-    inventory:
-      jdbc-url: jdbc:mysql://localhost:3306/inventory_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      username: root
-      password: password
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      hikari:
-        maximum-pool-size: 20
-        minimum-idle: 5
-        connection-timeout: 30000
-        idle-timeout: 600000
-        max-lifetime: 1800000
-    
-    flights-info:
-      jdbc-url: jdbc:mysql://localhost:3306/flights_info_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      username: root
-      password: password
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      hikari:
-        maximum-pool-size: 20
-        minimum-idle: 5
-        connection-timeout: 30000
-        idle-timeout: 600000
-        max-lifetime: 1800000
-    
-    search:
-      jdbc-url: jdbc:mysql://localhost:3306/search_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      username: root
-      password: password
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      hikari:
-        maximum-pool-size: 20
-        minimum-idle: 5
-        connection-timeout: 30000
-        idle-timeout: 600000
-        max-lifetime: 1800000
-    
-    booking:
-      jdbc-url: jdbc:mysql://localhost:3306/booking_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      username: root
-      password: password
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      hikari:
-        maximum-pool-size: 20
-        minimum-idle: 5
-        connection-timeout: 30000
-        idle-timeout: 600000
-        max-lifetime: 1800000
-  
-  # JPA Configuration
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        format_sql: true
-        use_sql_comments: true
-  
-  # Redis Configuration
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      password: 
-      database: 0
-      timeout: 2000ms
-      jedis:
-        pool:
-          max-active: 20
-          max-idle: 10
-          min-idle: 5
-          max-wait: 1000ms
-  
-  # Jackson Configuration
-  jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: UTC
-    serialization:
-      write-dates-as-timestamps: false
+    active: local # Default to local development
 
-# Server Configuration
+# Common Server Configuration
 server:
   port: 8080
-  servlet:
-    context-path: /
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    min-response-size: 1024
 
-# Management Endpoints
+# Common Management Endpoints
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics,prometheus
+      base-path: /actuator
   endpoint:
     health:
       show-details: always
@@ -111,18 +32,13 @@ management:
       export:
         enabled: true
 
-# Logging Configuration
+# Common Logging Configuration
 logging:
-  level:
-    com.credtravels: DEBUG
-    org.springframework.security: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-# Application Specific Configuration
+# Common Application Configuration
 credtravels:
   # Search Configuration
   search:

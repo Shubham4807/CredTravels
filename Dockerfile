@@ -1,23 +1,24 @@
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
-# Copy Maven wrapper and pom.xml
-COPY .mvn/ .mvn/
-COPY mvnw mvnw
+# Install Maven
+RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
+
+# Copy pom.xml first for better caching
 COPY pom.xml ./
 
 # Download dependencies
-RUN ./mvnw dependency:go-offline -B
+RUN mvn dependency:go-offline -B
 
 # Copy source code
 COPY src ./src
 
 # Build the application
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # Create runtime image
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
@@ -34,5 +35,16 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:8080/actuator/health || exit 1
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the application with memory optimization (1GB max)
+ENTRYPOINT ["java", \
+  "-Xms512m", \
+  "-Xmx1g", \
+  "-XX:+UseG1GC", \
+  "-XX:MaxGCPauseMillis=200", \
+  "-XX:+UseStringDeduplication", \
+  "-XX:+OptimizeStringConcat", \
+  "-XX:+UseCompressedOops", \
+  "-XX:+UseCompressedClassPointers", \
+  "-XX:MaxMetaspaceSize=256m", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-jar", "app.jar"]

@@ -8,7 +8,7 @@ import java.time.LocalTime;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "search_flights")
+@Table(name = "search_flight")
 public class SearchFlight {
     
     @Id
@@ -62,13 +62,13 @@ public class SearchFlight {
     @Column(name = "route_popularity_score")
     private Integer routePopularityScore;
     
-    @Column(name = "last_updated")
+    @Column(name = "updated_at")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime lastUpdated;
+    private LocalDateTime updatedAt;
     
     // Constructors
     public SearchFlight() {
-        this.lastUpdated = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
     
     public SearchFlight(Long flightInfoId, String flightNumber, String airlineName) {
@@ -207,16 +207,16 @@ public class SearchFlight {
         this.routePopularityScore = routePopularityScore;
     }
     
-    public LocalDateTime getLastUpdated() {
-        return lastUpdated;
+        public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
-    
-    public void setLastUpdated(LocalDateTime lastUpdated) {
-        this.lastUpdated = lastUpdated;
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
     
     // Business methods
     public void updateTimestamp() {
-        this.lastUpdated = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 }

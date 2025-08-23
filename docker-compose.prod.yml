@@ -1,0 +1,125 @@
+# CredTravels - Production Docker Compose Configuration
+# Memory: 1 GB max total
+# Use: docker-compose -f docker-compose.prod.yml up -d
+
+version: '3.8'
+
+services:
+  # Single MySQL Instance with Multiple Databases - Production
+  mysql:
+    image: mysql:8.0
+    container_name: credtravels-mysql-prod
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_USER: ${MYSQL_USER:-credtravels}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-credtravels123}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/init-all-databases.sql:/docker-entrypoint-initdb.d/init-all-databases.sql
+    networks:
+      - credtravels-network-prod
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    restart: unless-stopped
+
+
+
+  # Redis Cache - Production
+  redis:
+    image: redis:7-alpine
+    container_name: credtravels-redis-prod
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - credtravels-network-prod
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.25'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+
+  # Nginx Load Balancer - Production
+  nginx:
+    image: nginx:alpine
+    container_name: credtravels-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - credtravels-app
+    networks:
+      - credtravels-network-prod
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+    restart: unless-stopped
+
+  # Spring Boot Application - Production
+  credtravels-app:
+    build: .
+    container_name: credtravels-app-prod
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_INVENTORY_URL: jdbc:mysql://mysql:3306/inventory_db?useSSL=true&allowPublicKeyRetrieval=false&serverTimezone=UTC
+      SPRING_DATASOURCE_FLIGHTS_INFO_URL: jdbc:mysql:3306/flights_info_db?useSSL=true&allowPublicKeyRetrieval=false&serverTimezone=UTC
+      SPRING_DATASOURCE_SEARCH_URL: jdbc:mysql:3306/search_db?useSSL=true&allowPublicKeyRetrieval=false&serverTimezone=UTC
+      SPRING_DATASOURCE_BOOKING_URL: jdbc:mysql:3306/booking_db?useSSL=true&allowPublicKeyRetrieval=false&serverTimezone=UTC
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      JWT_SECRET: ${JWT_SECRET:-production-secret-key-must-be-changed}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - credtravels-network-prod
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  credtravels-network-prod:
+    driver: bridge

@@ -1,6 +1,13 @@
 #!/bin/bash
 
-echo "🚀 Starting CredTravels Application..."
+# CredTravels - Application Runner Script
+# Supports local, docker, and production profiles
+# Memory: 1 GB max
+
+PROFILE=${1:-local}
+
+echo "🚀 Starting CredTravels Application with profile: $PROFILE"
+echo "💾 Memory requirements: 1 GB max"
 
 # Check if Docker is running
 if ! docker info > /dev/null 2>&1; then
@@ -19,9 +26,19 @@ fi
 
 echo "✅ Build successful!"
 
-# Start the services
-echo "🐳 Starting Docker services..."
-docker-compose up -d
+# Start the services based on profile
+echo "🐳 Starting Docker services with profile: $PROFILE..."
+
+if [ "$PROFILE" = "prod" ]; then
+    echo "🏭 Starting production environment..."
+    docker-compose -f docker-compose.prod.yml up -d
+elif [ "$PROFILE" = "docker" ]; then
+    echo "🐳 Starting Docker environment..."
+    docker-compose up -d
+else
+    echo "🏠 Starting local environment..."
+    docker-compose up -d
+fi
 
 # Wait for services to be ready
 echo "⏳ Waiting for services to be ready..."
@@ -44,8 +61,22 @@ if [ $? -eq 0 ]; then
     echo "   - Search: http://localhost/api/search"
     echo "   - Booking: http://localhost/api/booking"
     echo ""
-    echo "🛑 To stop the application, run: docker-compose down"
+    echo "🛑 To stop the application, run:"
+    if [ "$PROFILE" = "prod" ]; then
+        echo "   docker-compose -f docker-compose.prod.yml down"
+    else
+        echo "   docker-compose down"
+    fi
+    echo ""
+    echo "📚 Usage:"
+    echo "   ./run.sh          # Start with local profile (default)"
+    echo "   ./run.sh docker   # Start with docker profile"
+    echo "   ./run.sh prod     # Start with production profile"
 else
     echo "❌ Service health check failed. Please check the logs:"
-    echo "   docker-compose logs credtravels-app"
+    if [ "$PROFILE" = "prod" ]; then
+        echo "   docker-compose -f docker-compose.prod.yml logs credtravels-app-prod"
+    else
+        echo "   docker-compose logs credtravels-app"
+    fi
 fi

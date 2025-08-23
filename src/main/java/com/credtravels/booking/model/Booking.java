@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "bookings")
+@Table(name = "booking")
 public class Booking {
     
     @Id
@@ -49,9 +49,7 @@ public class Booking {
     @Column(name = "booking_status")
     private BookingStatus bookingStatus;
     
-    @Column(name = "booking_date")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime bookingDate;
+
     
     @Column(name = "confirmation_date")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -79,7 +77,7 @@ public class Booking {
     public Booking() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        this.bookingDate = LocalDateTime.now();
+
         this.paymentStatus = PaymentStatus.PENDING;
         this.bookingStatus = BookingStatus.RESERVED;
         this.version = 1L;
@@ -187,13 +185,7 @@ public class Booking {
         this.bookingStatus = bookingStatus;
     }
     
-    public LocalDateTime getBookingDate() {
-        return bookingDate;
-    }
     
-    public void setBookingDate(LocalDateTime bookingDate) {
-        this.bookingDate = bookingDate;
-    }
     
     public LocalDateTime getConfirmationDate() {
         return confirmationDate;

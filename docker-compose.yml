@@ -1,70 +1,29 @@
 version: '3.8'
 
 services:
-  # MySQL Databases
-  mysql-inventory:
+  # Single MySQL Instance with Multiple Databases
+  mysql:
     image: mysql:8.0
-    container_name: credtravels-mysql-inventory
+    container_name: credtravels-mysql
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: inventory_db
       MYSQL_USER: credtravels
       MYSQL_PASSWORD: credtravels123
     ports:
       - "3306:3306"
     volumes:
-      - mysql_inventory_data:/var/lib/mysql
-      - ./sql/init-inventory.sql:/docker-entrypoint-initdb.d/init-inventory.sql
+      - mysql_data:/var/lib/mysql
+      - ./sql/init-all-databases.sql:/docker-entrypoint-initdb.d/init-all-databases.sql
     networks:
       - credtravels-network
-
-  mysql-flights-info:
-    image: mysql:8.0
-    container_name: credtravels-mysql-flights-info
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: flights_info_db
-      MYSQL_USER: credtravels
-      MYSQL_PASSWORD: credtravels123
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql_flights_info_data:/var/lib/mysql
-      - ./sql/init-flights-info.sql:/docker-entrypoint-initdb.d/init-flights-info.sql
-    networks:
-      - credtravels-network
-
-  mysql-search:
-    image: mysql:8.0
-    container_name: credtravels-mysql-search
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: search_db
-      MYSQL_USER: credtravels
-      MYSQL_PASSWORD: credtravels123
-    ports:
-      - "3308:3306"
-    volumes:
-      - mysql_search_data:/var/lib/mysql
-      - ./sql/init-search.sql:/docker-entrypoint-initdb.d/init-search.sql
-    networks:
-      - credtravels-network
-
-  mysql-booking:
-    image: mysql:8.0
-    container_name: credtravels-mysql-booking
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: booking_db
-      MYSQL_USER: credtravels
-      MYSQL_PASSWORD: credtravels123
-    ports:
-      - "3309:3306"
-    volumes:
-      - mysql_booking_data:/var/lib/mysql
-      - ./sql/init-booking.sql:/docker-entrypoint-initdb.d/init-booking.sql
-    networks:
-      - credtravels-network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
 
   # Redis Cache
   redis:
@@ -76,6 +35,14 @@ services:
       - redis_data:/data
     networks:
       - credtravels-network
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.25'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
 
   # Nginx Load Balancer
   nginx:
@@ -91,6 +58,14 @@ services:
       - credtravels-app
     networks:
       - credtravels-network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
 
   # Spring Boot Application
   credtravels-app:
@@ -100,25 +75,27 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_INVENTORY_URL: jdbc:mysql://mysql-inventory:3306/inventory_db
-      SPRING_DATASOURCE_FLIGHTS_INFO_URL: jdbc:mysql://mysql-flights-info:3306/flights_info_db
-      SPRING_DATASOURCE_SEARCH_URL: jdbc:mysql://mysql-search:3306/search_db
-      SPRING_DATASOURCE_BOOKING_URL: jdbc:mysql://mysql-booking:3306/booking_db
+      SPRING_DATASOURCE_INVENTORY_URL: jdbc:mysql://mysql:3306/inventory_db
+      SPRING_DATASOURCE_FLIGHTS_INFO_URL: jdbc:mysql:3306/flights_info_db
+      SPRING_DATASOURCE_SEARCH_URL: jdbc:mysql:3306/search_db
+      SPRING_DATASOURCE_BOOKING_URL: jdbc:mysql:3306/booking_db
       SPRING_DATA_REDIS_HOST: redis
     depends_on:
-      - mysql-inventory
-      - mysql-flights-info
-      - mysql-search
-      - mysql-booking
+      - mysql
       - redis
     networks:
       - credtravels-network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
 
 volumes:
-  mysql_inventory_data:
-  mysql_flights_info_data:
-  mysql_search_data:
-  mysql_booking_data:
+  mysql_data:
   redis_data:
 
 networks:

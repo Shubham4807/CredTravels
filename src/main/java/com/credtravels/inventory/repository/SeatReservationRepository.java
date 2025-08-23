@@ -23,6 +23,5 @@ public interface SeatReservationRepository extends JpaRepository<SeatReservation
     @Query("SELECT sr FROM SeatReservation sr WHERE sr.flightInventoryId = :flightInventoryId AND sr.status = 'RESERVED'")
     List<SeatReservation> findActiveReservationsByFlight(@Param("flightInventoryId") Long flightInventoryId);
     
-    @Query("SELECT sr FROM SeatReservation sr WHERE sr.reservedUntil < :now")
-    List<SeatReservation> findExpiredReservations();
+
 }

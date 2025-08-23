@@ -1,16 +1,16 @@
 package com.credtravels.common.config;
 
-import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -18,30 +18,23 @@ import java.util.Map;
 
 @Configuration
 @EnableJpaRepositories(
-    basePackages = "com.credtravels.inventory.repository",
-    entityManagerFactoryRef = "inventoryEntityManagerFactory",
-    transactionManagerRef = "inventoryTransactionManager"
+    basePackages = "com.credtravels.search.repository",
+    entityManagerFactoryRef = "searchEntityManagerFactory",
+    transactionManagerRef = "searchTransactionManager"
 )
-public class MultiDataSourceConfig {
+public class SearchConfig {
 
     @Bean
-    @ConfigurationProperties("spring.datasource.inventory")
-    public DataSource inventoryDataSource() {
+    @ConfigurationProperties("spring.datasource.search")
+    public DataSource searchDataSource() {
         return DataSourceBuilder.create().type(HikariDataSource.class).build();
     }
 
     @Bean
-    @Primary
-    public DataSource primaryDataSource() {
-        return inventoryDataSource();
-    }
-
-    @Bean
-    @Primary
-    public LocalContainerEntityManagerFactoryBean inventoryEntityManagerFactory() {
+    public LocalContainerEntityManagerFactoryBean searchEntityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(inventoryDataSource());
-        em.setPackagesToScan("com.credtravels.inventory.model");
+        em.setDataSource(searchDataSource());
+        em.setPackagesToScan("com.credtravels.search.model");
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         
         Map<String, Object> properties = new HashMap<>();
@@ -53,15 +46,10 @@ public class MultiDataSourceConfig {
         return em;
     }
 
-
-
     @Bean
-    @Primary
-    public PlatformTransactionManager inventoryTransactionManager() {
+    public PlatformTransactionManager searchTransactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(inventoryEntityManagerFactory().getObject());
+        transactionManager.setEntityManagerFactory(searchEntityManagerFactory().getObject());
         return transactionManager;
     }
-
-
 }
