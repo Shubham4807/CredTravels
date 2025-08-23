@@ -1,0 +1,135 @@
+version: '3.8'
+
+services:
+  # MySQL Databases
+  mysql-inventory:
+    image: mysql:8.0
+    container_name: credtravels-mysql-inventory
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: inventory_db
+      MYSQL_USER: credtravels
+      MYSQL_PASSWORD: credtravels123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_inventory_data:/var/lib/mysql
+      - ./sql/init-inventory.sql:/docker-entrypoint-initdb.d/init-inventory.sql
+    networks:
+      - credtravels-network
+    command: --default-authentication-plugin=mysql_native_password
+
+  mysql-flights-info:
+    image: mysql:8.0
+    container_name: credtravels-mysql-flights-info
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: flights_info_db
+      MYSQL_USER: credtravels
+      MYSQL_PASSWORD: credtravels123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_flights_info_data:/var/lib/mysql
+      - ./sql/init-flights-info.sql:/docker-entrypoint-initdb.d/init-flights-info.sql
+    networks:
+      - credtravels-network
+    command: --default-authentication-plugin=mysql_native_password
+
+  mysql-search:
+    image: mysql:8.0
+    container_name: credtravels-mysql-search
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: search_db
+      MYSQL_USER: credtravels
+      MYSQL_PASSWORD: credtravels123
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_search_data:/var/lib/mysql
+      - ./sql/init-search.sql:/docker-entrypoint-initdb.d/init-search.sql
+    networks:
+      - credtravels-network
+    command: --default-authentication-plugin=mysql_native_password
+
+  mysql-booking:
+    image: mysql:8.0
+    container_name: credtravels-mysql-booking
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: booking_db
+      MYSQL_USER: credtravels
+      MYSQL_PASSWORD: credtravels123
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql_booking_data:/var/lib/mysql
+      - ./sql/init-booking.sql:/docker-entrypoint-initdb.d/init-booking.sql
+    networks:
+      - credtravels-network
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: credtravels-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - credtravels-network
+    command: redis-server --appendonly yes
+
+  # Nginx Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: credtravels-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - credtravels-app
+    networks:
+      - credtravels-network
+
+  # CredTravels Application
+  credtravels-app:
+    build: .
+    container_name: credtravels-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_INVENTORY_URL: jdbc:mysql://mysql-inventory:3306/inventory_db
+      SPRING_DATASOURCE_FLIGHTS_INFO_URL: jdbc:mysql://mysql-flights-info:3306/flights_info_db
+      SPRING_DATASOURCE_SEARCH_URL: jdbc:mysql://mysql-search:3306/search_db
+      SPRING_DATASOURCE_BOOKING_URL: jdbc:mysql://mysql-booking:3306/booking_db
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+    depends_on:
+      - mysql-inventory
+      - mysql-flights-info
+      - mysql-search
+      - mysql-booking
+      - redis
+    networks:
+      - credtravels-network
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  mysql_inventory_data:
+  mysql_flights_info_data:
+  mysql_search_data:
+  mysql_booking_data:
+  redis_data:
+
+networks:
+  credtravels-network:
+    driver: bridge

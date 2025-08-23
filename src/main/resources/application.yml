@@ -1,0 +1,165 @@
+spring:
+  application:
+    name: credtravels
+  
+  profiles:
+    active: dev
+  
+  # Database Configurations
+  datasource:
+    inventory:
+      jdbc-url: jdbc:mysql://localhost:3306/inventory_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      username: root
+      password: password
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        maximum-pool-size: 20
+        minimum-idle: 5
+        connection-timeout: 30000
+        idle-timeout: 600000
+        max-lifetime: 1800000
+    
+    flights-info:
+      jdbc-url: jdbc:mysql://localhost:3306/flights_info_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      username: root
+      password: password
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        maximum-pool-size: 20
+        minimum-idle: 5
+        connection-timeout: 30000
+        idle-timeout: 600000
+        max-lifetime: 1800000
+    
+    search:
+      jdbc-url: jdbc:mysql://localhost:3306/search_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      username: root
+      password: password
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        maximum-pool-size: 20
+        minimum-idle: 5
+        connection-timeout: 30000
+        idle-timeout: 600000
+        max-lifetime: 1800000
+    
+    booking:
+      jdbc-url: jdbc:mysql://localhost:3306/booking_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      username: root
+      password: password
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        maximum-pool-size: 20
+        minimum-idle: 5
+        connection-timeout: 30000
+        idle-timeout: 600000
+        max-lifetime: 1800000
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+        use_sql_comments: true
+  
+  # Redis Configuration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 
+      database: 0
+      timeout: 2000ms
+      jedis:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+          max-wait: 1000ms
+  
+  # Jackson Configuration
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: UTC
+    serialization:
+      write-dates-as-timestamps: false
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+# Management Endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    com.credtravels: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Application Specific Configuration
+credtravels:
+  # Search Configuration
+  search:
+    max-hops: 3
+    max-layover-hours: 12
+    min-connection-time:
+      domestic: 45
+      international: 90
+    result-limit: 100
+    cache-ttl: 900 # 15 minutes
+  
+  # Inventory Configuration
+  inventory:
+    reservation-timeout: 900 # 15 minutes
+    cache-ttl: 300 # 5 minutes
+    pricing-cache-ttl: 60 # 1 minute
+  
+  # Booking Configuration
+  booking:
+    payment-timeout: 300 # 5 minutes
+    max-passengers: 9
+    seat-reservation-ttl: 900 # 15 minutes
+  
+  # Security Configuration
+  security:
+    jwt:
+      secret: your-secret-key-here-make-it-very-long-and-secure-in-production
+      expiration: 86400000 # 24 hours
+    rate-limit:
+      requests-per-minute: 100
+      burst-capacity: 200
+  
+  # Cache Configuration
+  cache:
+    ttl:
+      flight-info: 3600 # 1 hour
+      routes: 14400 # 4 hours
+      popular-routes: 21600 # 6 hours
+      airport-suggestions: 3600 # 1 hour
+      user-session: 3600 # 1 hour
