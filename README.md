@@ -10,6 +10,7 @@
 - [Quick Start](#-quick-start)
 
 ### 🗄️ **Data & Configuration**
+- [Database Initialization & Dummy Data](#️-database-initialization--dummy-data)
 - [Database Schema](#️-database-schema)
 - [Configuration Profiles](#️-configuration-profiles)
 - [Application Properties](#application-properties)
@@ -164,6 +165,144 @@ curl http://localhost/health
 
 # Test any API endpoint directly (No login required)
 curl http://localhost:8080/api/inventory/flights/1?flightDate=2024-01-15
+```
+
+## 🗄️ Database Initialization & Dummy Data
+
+### Database Setup Process
+
+The application uses a **single MySQL instance** with **4 separate databases** for modular architecture:
+
+#### **1. Database Creation Order**
+```sql
+-- Step 1: Create all databases
+CREATE DATABASE IF NOT EXISTS inventory_db;
+CREATE DATABASE IF NOT EXISTS flights_info_db;
+CREATE DATABASE IF NOT EXISTS search_db;
+CREATE DATABASE IF NOT EXISTS booking_db;
+
+-- Step 2: Grant permissions
+GRANT ALL PRIVILEGES ON inventory_db.* TO 'credtravels'@'%';
+GRANT ALL PRIVILEGES ON flights_info_db.* TO 'credtravels'@'%';
+GRANT ALL PRIVILEGES ON search_db.* TO 'credtravels'@'%';
+GRANT ALL PRIVILEGES ON booking_db.* TO 'credtravels'@'%';
+```
+
+#### **2. Table Creation Order**
+The tables are created in **dependency order** to ensure foreign key constraints work correctly:
+
+**Phase 1: Core Reference Tables**
+```sql
+-- flights_info_db (Independent tables first)
+USE flights_info_db;
+CREATE TABLE airlines (...);
+CREATE TABLE airports (...);
+CREATE TABLE aircraft (...);
+CREATE TABLE flight_routes (...);
+CREATE TABLE flight_info (...);
+```
+
+**Phase 2: Inventory Tables**
+```sql
+-- inventory_db (Depends on flight_info)
+USE inventory_db;
+CREATE TABLE flight_inventory (...);
+CREATE TABLE inventory_update_log (...);
+CREATE TABLE seat_reservations (...);
+```
+
+**Phase 3: Search Tables**
+```sql
+-- search_db (Depends on flight_info)
+USE search_db;
+CREATE TABLE search_flight (...);
+CREATE TABLE popular_routes (...);
+CREATE TABLE search_analytics (...);
+```
+
+**Phase 4: Booking Tables**
+```sql
+-- booking_db (Depends on customer and flight_info)
+USE booking_db;
+CREATE TABLE customer (...);
+CREATE TABLE booking (...);
+CREATE TABLE passenger_detail (...);
+CREATE TABLE payment_history (...);
+```
+
+#### **3. Dummy Data Population**
+After table creation, comprehensive dummy data is populated:
+
+**Step 1: Basic Reference Data**
+```sql
+-- Airlines (5 records)
+INSERT INTO airlines VALUES ('AI', 'AIC', 'Air India', 'India', 4.2, ...);
+
+-- Airports (8 records)
+INSERT INTO airports VALUES ('DEL', 'VIDP', 'Indira Gandhi International Airport', ...);
+
+-- Aircraft (5 records)
+INSERT INTO aircraft VALUES ('Boeing 737-800', 'Boeing', '{"economy": 150, ...}', ...);
+```
+
+**Step 2: Flight Routes & Schedules**
+```sql
+-- Flight Routes (18 routes)
+INSERT INTO flight_routes VALUES ('DEL', 'BOM', 1150, 120, 'DOMESTIC');
+
+-- Flight Information (20 flights)
+INSERT INTO flight_info VALUES ('AI101', 1, 1, 'DEL', 'BOM', '10:00:00', ...);
+```
+
+**Step 3: Inventory Data**
+```sql
+-- Flight Inventory (12 records across multiple dates)
+INSERT INTO flight_inventory VALUES (1, '2024-01-15', '{"economy": 150, ...}', ...);
+
+-- Seat Reservations (4 test reservations)
+INSERT INTO seat_reservations VALUES (1, 'RES001', 'ECONOMY', 2, ...);
+```
+
+**Step 4: Search Optimization Data**
+```sql
+-- Search Flight Data (20 optimized records)
+INSERT INTO search_flight VALUES (1, 'AI101', 'Air India', 'DEL', ...);
+
+-- Popular Routes (10 analytics records)
+INSERT INTO popular_routes VALUES ('DEL', 'BOM', 1500, 15500.00, ...);
+```
+
+**Step 5: Customer & Booking Data**
+```sql
+-- Customers (5 profiles)
+INSERT INTO customer VALUES ('user001', 'John', 'Doe', 'john.doe@example.com', ...);
+
+-- Bookings (8 records with different statuses)
+INSERT INTO booking VALUES ('BK20240115001', 1, 1, '2024-01-15', 'ECONOMY', ...);
+
+-- Passenger Details (12 records)
+INSERT INTO passenger_detail VALUES (1, 'John', 'Doe', '1990-01-15', ...);
+
+-- Payment History (8 transactions)
+INSERT INTO payment_history VALUES (1, 'CREDIT_CARD', 30000.00, 'TXN001', ...);
+```
+
+#### **4. Data Population Summary**
+| **Database** | **Tables** | **Dummy Records** | **Purpose** |
+|--------------|------------|-------------------|-------------|
+| **inventory_db** | 3 | 16 | Flight availability & seat reservations |
+| **flights_info_db** | 5 | 56 | Airlines, airports, aircraft, routes, schedules |
+| **search_db** | 3 | 30 | Search optimization & analytics |
+| **booking_db** | 4 | 33 | Customer profiles, bookings, payments |
+
+#### **5. Initialization Files**
+- **`sql/init-all-databases.sql`**: Creates databases, tables, and basic sample data
+- **`sql/dummy-data.sql`**: Comprehensive dummy data for testing (run separately)
+
+#### **6. Running Dummy Data**
+```bash
+# After container startup, populate with comprehensive dummy data
+docker exec -i credtravels-mysql-prod mysql -uroot -prootpassword < sql/dummy-data.sql
 ```
 
 ## 🗄️ Database Schema
@@ -482,16 +621,19 @@ curl http://localhost:8080/api/inventory/flights/1?flightDate=2024-01-15
 - **Development friendly** - easy testing and integration
 
 ### Postman Collection
-Import the updated Postman collection from `postman/CredTravels_Updated.postman_collection.json` to test all APIs with detailed examples.
+Import the complete Postman collection from `postman/CredTravels.postman_collection.json` to test all APIs with comprehensive dummy data examples.
 
-**Features of the Updated Collection:**
+**Features of the Collection:**
 - ✅ **Complete API Coverage**: All 4 modules with their endpoints
+- ✅ **Comprehensive Dummy Data**: Realistic test data for all scenarios
+- ✅ **Multiple Test Cases**: Different data sets for each endpoint
 - ✅ **Real Request Examples**: Proper JSON payloads for POST/PUT requests
-- ✅ **Query Parameters**: Pre-filled with realistic values
+- ✅ **Query Parameters**: Pre-filled with realistic values from dummy data
 - ✅ **Environment Variables**: Easy switching between local and production
 - ✅ **Organized by Module**: Clear separation of concerns
 - ✅ **Health Check Endpoints**: Application monitoring and diagnostics
 - ✅ **Background Process Testing**: Scheduled task endpoints for testing
+- ✅ **No Authentication Required**: All APIs publicly accessible
 
 **Collection Structure:**
 1. **🏥 Health & Monitoring**: Application health, info, and metrics
