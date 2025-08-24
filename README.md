@@ -1,5 +1,69 @@
 # CredTravels - Complete Travel Booking System
 
+## 📋 **Table of Contents**
+
+### 🚀 **Getting Started**
+- [Project Overview](#-project-overview)
+- [Architecture Overview](#️-architecture-overview)
+- [Technology Stack](#technology-stack)
+- [Project Structure](#-project-structure)
+- [Quick Start](#-quick-start)
+
+### 🗄️ **Data & Configuration**
+- [Database Schema](#️-database-schema)
+- [Configuration Profiles](#️-configuration-profiles)
+- [Application Properties](#application-properties)
+- [Database Configuration](#database-configuration)
+- [Redis Configuration](#redis-configuration)
+
+### 🔌 **API Documentation**
+- [API Endpoints & Detailed Logic](#️-api-endpoints--detailed-logic)
+  - [Health & Monitoring](#️-health--monitoring)
+  - [Inventory Management](#️-inventory-management)
+  - [Flights Information](#️-flights-information)
+  - [Search Service](#️-search-service)
+  - [Booking Service](#️-booking-service)
+  - [Background Processes](#️-background-processes--scheduled-tasks)
+
+### 🚀 **Deployment & Operations**
+- [Deployment & Configuration](#️-deployment--configuration)
+  - [Prerequisites](#️-prerequisites)
+  - [Docker Deployment](#️-docker-deployment)
+  - [Production Deployment Guide](#️-production-deployment-guide)
+  - [Resource Requirements](#️-resource-requirements)
+  - [Monitoring & Health Checks](#️-monitoring--health-checks)
+  - [Troubleshooting](#️-troubleshooting)
+  - [Scaling & Performance](#️-scaling--performance)
+  - [Deployment Checklist](#️-deployment-checklist)
+
+### 🧪 **Testing & Development**
+- [Testing](#️-testing)
+  - [No Authentication Required](#️-no-authentication-required)
+  - [Postman Collection](#postman-collection)
+  - [API Testing Examples](#api-testing-examples)
+
+### 🔍 **Monitoring & Observability**
+- [Monitoring & Observability](#️-monitoring--observability)
+  - [Health Checks](#health-checks)
+  - [Metrics](#metrics)
+  - [Logging](#logging)
+
+### 🔓 **System Features**
+- [Open Access (No Security)](#️-open-access-no-security)
+- [Performance Optimization](#️-performance-optimization)
+- [Recent Fixes & Improvements](#️-recent-fixes--improvements)
+- [Future Enhancements](#️-future-enhancements)
+
+### 🐛 **Support & Troubleshooting**
+- [Troubleshooting](#️-troubleshooting-1)
+- [Additional Resources](#️-additional-resources)
+- [Contributing](#️-contributing)
+- [License](#️-license)
+- [Support](#️-support)
+- [Current System Status](#️-current-system-status)
+
+---
+
 ## 🚀 Project Overview
 
 CredTravels is a comprehensive travel booking system built with Spring Boot, featuring a modular architecture that separates concerns into distinct services while maintaining a single application deployment. The system provides flight search, inventory management, booking capabilities, and real-time availability tracking.
