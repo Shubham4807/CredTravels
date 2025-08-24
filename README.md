@@ -358,24 +358,24 @@ curl http://localhost:8080/api/inventory/flights/1?flightDate=2024-01-15
 #### `GET /api/booking/user/{userId}`
 - **Purpose**: Get user's booking history
 - **Logic**:
-  - **Access Control**: Validates user authentication
   - **Data Retrieval**: Fetches all user bookings
   - **Status Filtering**: Supports filtering by booking status
   - **Date Range**: Optional date range filtering
   - **Pagination**: Large result sets are paginated
 - **Parameters**: User ID, status filter, date range, page, size
 - **Response**: Paginated list of user bookings
+- **Access**: Public endpoint, no authentication required
 
 #### `POST /api/booking/payment/callback`
 - **Purpose**: Handle payment gateway callbacks
 - **Logic**:
   - **Payment Verification**: Validates payment gateway response
-  - **Security Check**: Verifies callback authenticity
+  - **Callback Validation**: Verifies callback data integrity
   - **Status Update**: Updates booking payment status
   - **Inventory Update**: Confirms seat allocation
   - **Notification**: Sends confirmation to customer
-- **Security**: HMAC signature validation, IP whitelist
 - **Response**: Payment processing confirmation
+- **Access**: Public endpoint, no authentication required
 
 ### 🔄 Background Processes & Scheduled Tasks
 
@@ -528,27 +528,389 @@ spring:
           min-idle: 5
 ```
 
-## 🚀 Deployment
+## 🚀 Deployment & Configuration
 
-### Docker Deployment
+### 📋 **Prerequisites**
+- Java 17 or higher
+- Maven 3.6+
+- Docker and Docker Compose
+- At least 3GB RAM available (reduced from 8GB)
+
+### 🔧 **Configuration Profiles**
+
+The application supports multiple configuration profiles:
+
+#### **Local Development (`local`)**
+- **Memory**: 1GB maximum
+- **Database**: Local MySQL instance with 4 databases
+- **Cache**: Local Redis
+- **Configuration**: `application-local.yml`
+
+#### **Production (`prod`)**
+- **Memory**: 1GB maximum
+- **Database**: Production MySQL instance with 4 databases
+- **Cache**: Production Redis cluster
+- **Configuration**: `application-prod.yml`
+- **SSL/TLS**: Enabled for database connections
+- **Externalized Configuration**: Environment variables
+
+#### **Docker (`docker`)**
+- **Memory**: 1GB maximum
+- **Database**: Single MySQL Docker container with 4 databases
+- **Cache**: Redis Docker container
+- **Configuration**: Environment variables override
+
+### 🐳 **Docker Deployment**
+
+#### **Local Development Setup**
 ```bash
-# Build and start all services
-docker-compose up -d --build
+# Clone and navigate to project
+git clone <repository-url>
+cd CredTravelsCode
+
+# Start all services (local configuration)
+docker-compose up -d
+
+# This will start:
+# - MySQL (port 3306) with 4 databases
+# - Redis (port 6379)
+# - CredTravels App (port 8080)
+# - Nginx (port 80)
 
 # View logs
 docker-compose logs -f credtravels-app
 
-# Scale application instances
-docker-compose up -d --scale credtravels-app=3
+# Check health
+curl http://localhost:8080/actuator/health
 ```
 
-### Production Considerations
+#### **Production Deployment**
+```bash
+# Set up production environment variables
+cp env.prod.example .env.prod
+# Edit .env.prod with your production values
+
+# Deploy with production configuration
+docker-compose -f docker-compose.prod.yml up -d --build
+
+# This will start:
+# - MySQL Production (port 3306) with SSL
+# - Redis Production (port 6379) with password
+# - CredTravels App Production (port 8080)
+# - Nginx Production (port 80, 443)
+
+# View production logs
+docker-compose -f docker-compose.prod.yml logs -f credtravels-app-prod
+
+# Check production health
+curl http://localhost:8080/actuator/health
+```
+
+#### **Environment-Specific Commands**
+
+**Local Development:**
+```bash
+# Start local environment
+docker-compose up -d
+
+# Stop local environment
+docker-compose down
+
+# Rebuild and restart
+docker-compose up -d --build
+
+# View logs
+docker-compose logs -f credtravels-app
+```
+
+**Production Environment:**
+```bash
+# Start production environment
+docker-compose -f docker-compose.prod.yml up -d --build
+
+# Stop production environment
+docker-compose -f docker-compose.prod.yml down
+
+# Scale application instances
+docker-compose -f docker-compose.prod.yml up -d --scale credtravels-app=3
+
+# View production logs
+docker-compose -f docker-compose.prod.yml logs -f credtravels-app-prod
+```
+
+### 🔄 **Configuration Management**
+
+#### **Application Properties**
+Key configuration options in `application.yml`:
+
+```yaml
+credtravels:
+  search:
+    max-hops: 3                    # Maximum connections for multi-hop search
+    max-layover-hours: 12          # Maximum layover time
+    min-connection-time:
+      domestic: 45                 # Minimum connection time (minutes)
+      international: 90
+    result-limit: 100              # Maximum search results
+  
+  inventory:
+    reservation-timeout: 900        # Seat reservation timeout (seconds)
+    cache-ttl: 300                 # Inventory cache TTL (seconds)
+    pricing-cache-ttl: 60          # Pricing cache TTL (seconds)
+  
+  booking:
+    payment-timeout: 300           # Payment processing timeout (seconds)
+    max-passengers: 9              # Maximum passengers per booking
+    seat-reservation-ttl: 900     # Seat reservation TTL (seconds)
+  
+  # No security configuration required
+  # All APIs are publicly accessible without authentication
+```
+
+#### **Database Configuration**
+Each module connects to its dedicated database:
+
+**Local Configuration:**
+```yaml
+spring:
+  datasource:
+    inventory:
+      jdbc-url: jdbc:mysql://localhost:3306/inventory_db
+    flights-info:
+      jdbc-url: jdbc:mysql://localhost:3307/flights_info_db
+    search:
+      jdbc-url: jdbc:mysql://localhost:3308/search_db
+    booking:
+      jdbc-url: jdbc:mysql://localhost:3309/booking_db
+```
+
+**Production Configuration (Single MySQL Instance):**
+```yaml
+spring:
+  datasource:
+    inventory:
+      jdbc-url: jdbc:mysql://mysql:3306/inventory_db?useSSL=true&allowPublicKeyRetrieval=false&serverTimezone=UTC
+    flights-info:
+      jdbc-url: jdbc:mysql://mysql:3306/flights_info_db?useSSL=true&allowPublicKeyRetrieval=false&serverTimezone=UTC
+    search:
+      jdbc-url: jdbc:mysql://mysql:3306/search_db?useSSL=true&allowPublicKeyRetrieval=false&serverTimezone=UTC
+    booking:
+      jdbc-url: jdbc:mysql://mysql:3306/booking_db?useSSL=true&allowPublicKeyRetrieval=false&serverTimezone=UTC
+```
+
+#### **Redis Configuration**
+```yaml
+spring:
+  data:
+    redis:
+      host: localhost              # localhost for local, redis for Docker
+      port: 6379
+      timeout: 2000ms
+      jedis:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+```
+
+### 🚀 **Production Deployment Guide**
+
+#### **1. Environment Setup**
+```bash
+# Copy production environment template
+cp env.prod.example .env.prod
+
+# Edit environment variables
+nano .env.prod
+```
+
+**Required Environment Variables:**
+```bash
+# Database Configuration
+MYSQL_ROOT_PASSWORD=your-secure-root-password
+MYSQL_USER=credtravels
+MYSQL_PASSWORD=your-secure-password
+
+# Redis Configuration
+REDIS_PASSWORD=your-redis-password
+
+# Application Configuration
+JWT_SECRET=your-jwt-secret-key
+JWT_EXPIRATION=86400000
+
+# Optional: Override database URLs
+INVENTORY_DB_URL=jdbc:mysql://mysql:3306/inventory_db?useSSL=true
+FLIGHTS_INFO_DB_URL=jdbc:mysql://mysql:3306/flights_info_db?useSSL=true
+SEARCH_DB_URL=jdbc:mysql:mysql:3306/search_db?useSSL=true
+BOOKING_DB_URL=jdbc:mysql:mysql:3306/booking_db?useSSL=true
+```
+
+#### **2. Database Initialization**
+```bash
+# Initialize all databases
+docker-compose -f docker-compose.prod.yml up -d mysql
+
+# Wait for MySQL to start, then initialize databases
+docker exec -i credtravels-mysql-prod mysql -uroot -p${MYSQL_ROOT_PASSWORD} < sql/init-all-databases.sql
+```
+
+#### **3. Application Deployment**
+```bash
+# Deploy application with production configuration
+docker-compose -f docker-compose.prod.yml up -d --build
+
+# Monitor startup
+docker-compose -f docker-compose.prod.yml logs -f credtravels-app-prod
+
+# Verify health
+curl http://localhost:8080/actuator/health
+```
+
+#### **4. Verification Steps**
+```bash
+# Check all services are running
+docker-compose -f docker-compose.prod.yml ps
+
+# Test database connectivity
+docker exec credtravels-app-prod nc -zv mysql 3306
+
+# Test Redis connectivity
+docker exec credtravels-app-prod redis-cli -h redis ping
+
+# Test API endpoints
+curl http://localhost:8080/api/inventory/flights/1?flightDate=2024-01-15
+curl http://localhost:8080/api/search/flights?from=DEL&to=BOM&date=2024-01-15
+```
+
+### 📊 **Resource Requirements**
+
+#### **Memory Optimization (1GB Total)**
+- **Application**: 512MB-1GB (JVM heap)
+- **MySQL**: 512MB-1GB
+- **Redis**: 256MB-512MB
+- **Nginx**: 64MB-128MB
+
+#### **CPU Requirements**
+- **Application**: 0.5-1.0 CPU cores
+- **MySQL**: 0.25-0.5 CPU cores
+- **Redis**: 0.1-0.25 CPU cores
+- **Nginx**: 0.1 CPU cores
+
+### 🔍 **Monitoring & Health Checks**
+
+#### **Health Endpoints**
+```bash
+# Application health
+curl http://localhost:8080/actuator/health
+
+# Application info
+curl http://localhost:8080/actuator/info
+
+# Application metrics
+curl http://localhost:8080/actuator/metrics
+```
+
+#### **Log Monitoring**
+```bash
+# View application logs
+docker-compose logs -f credtravels-app
+
+# View production logs
+docker-compose -f docker-compose.prod.yml logs -f credtravels-app-prod
+
+# View database logs
+docker-compose logs mysql
+
+# View Redis logs
+docker-compose logs redis
+```
+
+### 🛠️ **Troubleshooting**
+
+#### **Common Issues**
+
+**Application Won't Start:**
+```bash
+# Check logs
+docker-compose logs credtravels-app
+
+# Check resource usage
+docker stats
+
+# Restart with rebuild
+docker-compose up -d --build
+```
+
+**Database Connection Issues:**
+```bash
+# Check database connectivity
+docker exec credtravels-app nc -zv mysql 3306
+
+# Check database logs
+docker-compose logs mysql
+
+# Verify database initialization
+docker exec -i credtravels-mysql mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "SHOW DATABASES;"
+```
+
+**Redis Connection Issues:**
+```bash
+# Check Redis connectivity
+docker exec credtravels-app redis-cli -h redis ping
+
+# Check Redis logs
+docker-compose logs redis
+```
+
+### 🔄 **Scaling & Performance**
+
+#### **Horizontal Scaling**
+```bash
+# Scale application instances
+docker-compose -f docker-compose.prod.yml up -d --scale credtravels-app=3
+
+# Load balancer will distribute traffic
+```
+
+#### **Performance Monitoring**
+```bash
+# Monitor resource usage
+docker stats
+
+# Check application metrics
+curl http://localhost:8080/actuator/metrics
+
+# Monitor database connections
+docker exec credtravels-mysql mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "SHOW PROCESSLIST;"
+```
+
+### 📋 **Deployment Checklist**
+
+#### **Pre-Deployment**
+- [ ] Environment variables configured
+- [ ] Database passwords set
+- [ ] SSL certificates ready (production)
+- [ ] Resource limits configured
+- [ ] Health check endpoints accessible
+
+#### **Post-Deployment**
+- [ ] All services running
+- [ ] Health checks passing
+- [ ] Database connectivity verified
+- [ ] Redis connectivity verified
+- [ ] API endpoints responding
+- [ ] Scheduled tasks running
+- [ ] Logs being generated
+
+#### **Production Considerations**
 1. **Environment Variables**: Override configuration with environment variables
-2. **Resource Limits**: Set appropriate memory and CPU limits
+2. **Resource Limits**: Set appropriate memory and CPU limits (1GB total)
 3. **Health Checks**: Monitor application health with actuator endpoints
 4. **Logging**: Configure centralized logging (ELK stack)
 5. **Monitoring**: Use Prometheus and Grafana for metrics
 6. **API Access**: All endpoints publicly accessible (no authentication required)
+7. **Backup Strategy**: Regular database backups
+8. **SSL/TLS**: Configure HTTPS for production
 
 ## 🔍 Monitoring & Observability
 
@@ -568,7 +930,7 @@ docker-compose up -d --scale credtravels-app=3
 - Structured JSON logging
 - Correlation IDs for request tracing
 - Different log levels for environments
-- Security event logging
+- Business event logging
 
 ## 🔓 Open Access (No Security)
 
